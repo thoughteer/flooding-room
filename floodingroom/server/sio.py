@@ -30,7 +30,7 @@ class SIO(flask_socketio.SocketIO):
                     round_limit=3,
                     bet_limit=30)
             try:
-                self.room.add_player(flask.request.sid)
+                player = self.room.add_player(flask.request.sid)
             except Exception as exc:
                 self.emit("decline", {"reason": str(exc)})
                 return
@@ -39,6 +39,7 @@ class SIO(flask_socketio.SocketIO):
                 "players_limit": self.room.players_limit,
                 "round_limit": self.room.round_limit,
                 "bet_limit": self.room.bet_limit,
+                "player_type": player.type,
             })
 
         @self.on("disconnect")
