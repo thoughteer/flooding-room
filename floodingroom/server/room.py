@@ -104,8 +104,8 @@ class Room(object):
     def end_game(self):
         balance = 100.0 - self.total * 100.0 / self.points_limit
         if 0 < balance < 20.0:
-            return "Bad persons win"
-        return "Good persons win"
+            return "Good persons win"
+        return "Bad persons win"
 
     @property
     def is_game_over(self):
