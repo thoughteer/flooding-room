@@ -48,9 +48,10 @@ class SIO(flask_socketio.SocketIO):
                 "bet_limit": self.room.bet_limit,
                 "player_count": len(self.room.players),
                 "player_type": player.type,
+                "players": repr(self.room.players),
             })
             # start if full
-            if len(self.room.players) == self.room.players_limit:
+            if self.room.is_full:
                 self.room.start()
                 self.emit("start", {}, room=roomid)
                 return
