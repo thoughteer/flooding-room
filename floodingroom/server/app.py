@@ -20,6 +20,11 @@ def connect(sid, environ):
     print("connect ", sid)
 
 
+@sio.on("ready")
+def ready(sid, data):
+    sio.emit("accept", room=sid)
+
+
 @sio.on('chat message')
 def message(sid, data):
     print("message ", data)
