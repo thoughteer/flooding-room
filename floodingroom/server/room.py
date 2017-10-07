@@ -1,5 +1,6 @@
-import sys
+import datetime
 import random
+import sys
 
 
 class RoomException(Exception):
@@ -28,6 +29,7 @@ class BetOverflowException(RoomException):
 
 class Room(object):
     def __init__(self, roomid, points_limit, players_limit, round_limit, bet_limit):
+        self.timestamp = datetime.datetime.utcnow()
         self.id = roomid
         self.is_started = False
         self.points_limit = points_limit
