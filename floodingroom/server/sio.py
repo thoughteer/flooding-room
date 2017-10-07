@@ -21,7 +21,7 @@ class SIO(flask_socketio.SocketIO):
             print("connect ", flask.request.sid)
 
         @self.on("ready")
-        def accept(json):
+        def play(json):
             if self.room is None or self.room.is_game_over:
                 self.room = Room(
                     roomid=uuid.uuid4().hex,
@@ -32,14 +32,14 @@ class SIO(flask_socketio.SocketIO):
             try:
                 self.room.add_player(flask.request.sid)
             except Exception as exc:
-                self.emit("decline", room=flask.request.sid, data={"reason": str(exc)})
-            else:
-                self.emit("accept", room=flask.request.sid, data={
-                    "points_limit": self.room.points_limit,
-                    "players_limit": self.room.players_limit,
-                    "round_limit": self.room.round_limit,
-                    "bet_limit": self.room.bet_limit,
-                })
+                self.emit("decline", {"reason": str(exc)})
+                return
+            self.emit("accept", {
+                "points_limit": self.room.points_limit,
+                "players_limit": self.room.players_limit,
+                "round_limit": self.room.round_limit,
+                "bet_limit": self.room.bet_limit,
+            })
 
         @self.on("disconnect")
         def disconnect():
