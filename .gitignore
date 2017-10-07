@@ -1,1 +1,7 @@
-# Created by .ignore support plugin (hsz.mobi)
+*.pyc
+/*.egg-info/
+/.cache/
+/.pybuild/
+/.tox/
+__pycache__/
+
