@@ -32,8 +32,8 @@ class PlayerException(RoomException):
 
 class Player(object):
     class Type(object):
-        evil = 'Bad person'
-        good = 'Good person'
+        evil = 'evil'
+        good = 'good'
 
     def __init__(self, id, type, bet_limit):
         self.id = id
@@ -66,11 +66,10 @@ class Room(object):
         self.total = 0
         self.round = 0
         self.players = {}
-        self.pidors = get_pidors(players_limit)
+        self.pidors = random.sample(range(players_limit), players_limit // 3)
 
-    def get_player_type(self):
-        if len(self.players) == self.pidors[-1]:
-            self.pidors.pop()
+    def get_next_player_type(self):
+        if self.player_count in self.pidors:
             return Player.Type.evil
         return Player.Type.good
 
@@ -85,7 +84,8 @@ class Room(object):
         if self.is_started:
             raise GameStartedException('Game in {roomid} already started'.format(roomid=self.id))
 
-        self.players[sid] = Player(sid, self.get_player_type(), self.bet_limit)
+        self.players[sid] = Player(sid, self.get_next_player_type(), self.bet_limit)
+        return self.players[sid]
 
     def add_bet(self, sid, points):
         if sid not in self.players:
@@ -94,7 +94,7 @@ class Room(object):
 
     def end_round(self):
         self.round += 1
-        self.total += sum([player.bet for id, player in self.players.items()])
+        self.total += sum(player.bet for player in self.players.values())
 
     @property
     def is_game_over(self):
@@ -104,14 +104,6 @@ class Room(object):
     def is_full(self):
         return len(self.players) >= self.players_limit
 
-
-def get_pidors(number):
-    num_pidors = number / 3
-    indexes = []
-    while num_pidors > 0:
-        pidor = random.randint(0, number)
-        if pidor not in indexes:
-            indexes.append(pidor)
-            num_pidors -= 1
-
-    return list(reversed(sorted(indexes)))
+    @property
+    def player_count(self):
+        return len(self.players)
