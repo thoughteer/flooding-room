@@ -3,11 +3,13 @@ import random
 
 
 class Room(object):
-    def __init__(self, roomid, limit, players_limit):
+    def __init__(self, roomid, points_limit, players_limit, round_limit):
         self.id = roomid
-        self.limit = limit
+        self.points_limit = points_limit
         self.players_limit = players_limit
         self.total = 0
+        self.round = 0
+        self.round_limit = round_limit
         self.players_bets = {}
 
     def add_player(self, sid):
@@ -17,6 +19,8 @@ class Room(object):
         if len(self.players_bets) > self.players_limit:
             print('{roomid} room is full'.format(roomid=self.id), file=sys.stderr)
             return
+        if self.round != 0:
+            print('Game in {roomid} already started'.format(roomid=self.id), file=sys.stderr)
         self.players_bets[sid] = None
 
     def add_bet(self, sid, points):
@@ -32,11 +36,18 @@ class Room(object):
         self.players_bets[sid] = random.randint(a, b)
 
     def end_round(self):
+        self.round += 1
         for player, bet in self.players_bets.items():
             if not bet:
                 self.add_random_bet(player, 0, 20)
 
         self.total += sum([v for k, v in self.players_bets.items()])
-        if self.total >= self.limit:
-            return True
-        return False
+        return self.is_game_over
+
+    @property
+    def is_game_over(self):
+        return self.total >= self.points_limit or self.round >= self.round_limit
+
+    @property
+    def is_full(self):
+        return len(self.players_bets) >= self.players_limit

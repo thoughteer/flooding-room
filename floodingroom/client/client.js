@@ -6,7 +6,7 @@ $(document).ready(function() {
 
         socket.on("accept", function (data) {
             $("#start_overlay").remove();
-
+            console.log(data);
         });
 
         socket.emit("ready", {});
