@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+import eventlet
 import flask
 import flask_socketio
 
@@ -41,9 +42,9 @@ class SIO(flask_socketio.SocketIO):
                 flask_socketio.join_room(roomid)
                 print("client %s joined the room" % sid)
             except Exception as exc:
-                self.emit("decline", {"reason": str(exc)})
+                flask_socketio.emit("decline", {"reason": str(exc)})
                 return
-            self.emit("accept", {
+            flask_socketio.emit("accept", {
                 "points_limit": self.room.points_limit,
                 "players_limit": self.room.players_limit,
                 "round_limit": self.room.round_limit,
@@ -56,19 +57,19 @@ class SIO(flask_socketio.SocketIO):
             if self.room.is_full:
                 print("room is full, start!")
                 self.room.start()
-                self.emit("start", {}, room=roomid, broadcast=True)
+                flask_socketio.emit("start", {}, room=roomid)
                 return
             # wait for 30 seconds from room creation time
             start_time = self.room.timestamp + datetime.timedelta(seconds=30)
             now = datetime.datetime.utcnow()
             if now < start_time:
                 print("sleeping")
-                flask_socketio.sleep((start_time - now).total_seconds())
+                eventlet.sleep((start_time - now).total_seconds())
             # check whether the game has already started
             if not self.room.is_started:
                 # start anyway
                 self.room.start()
-                self.emit("start", {}, room=roomid, broadcast=True)
+                flask_socketio.emit("start", {}, room=roomid)
 
         @self.on("disconnect")
         def disconnect():
