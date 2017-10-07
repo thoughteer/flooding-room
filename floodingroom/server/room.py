@@ -29,6 +29,7 @@ class BetOverflowException(RoomException):
 class Room(object):
     def __init__(self, roomid, points_limit, players_limit, round_limit, bet_limit):
         self.id = roomid
+        self.is_started = False
         self.points_limit = points_limit
         self.players_limit = players_limit
         self.round_limit = round_limit
@@ -37,15 +38,17 @@ class Room(object):
         self.round = 0
         self.players_bets = {}
 
+    def start(self):
+        self.is_started = True
+
     def add_player(self, sid):
         if sid in self.players_bets:
             PlayerInRoomException('{sid} already in room {roomid}'.format(sid=sid, roomid=self.id))
             return
         if self.is_full:
             raise RoomOverflowException('{roomid} room is full'.format(roomid=self.id))
-        if self.round != 0:
+        if self.is_started:
             raise GameStartedException('Game in {roomid} already started'.format(roomid=self.id))
-
         self.players_bets[sid] = None
 
     def add_bet(self, sid, points):
