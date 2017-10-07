@@ -26,7 +26,7 @@ class SIO(flask_socketio.SocketIO):
             # create room if it doesn't exist yet or we're done
             if self.room is None or self.room.is_game_over:
                 self.room = Room(
-                    id=uuid.uuid4().hex,
+                    roomid=uuid.uuid4().hex,
                     points_limit=100,
                     players_limit=10,
                     round_limit=3,
@@ -36,7 +36,7 @@ class SIO(flask_socketio.SocketIO):
             sid = flask.request.sid
             # try to add the player
             try:
-                self.room.add_player(sid)
+                player = self.room.add_player(sid)
                 self.join_room(roomid, sid=sid)
             except Exception as exc:
                 self.emit("decline", {"reason": str(exc)})
@@ -47,6 +47,7 @@ class SIO(flask_socketio.SocketIO):
                 "round_limit": self.room.round_limit,
                 "bet_limit": self.room.bet_limit,
                 "player_count": len(self.room.players),
+                "player_type": player.type,
             })
             # start if full
             if len(self.room.players) == self.room.players_limit:
