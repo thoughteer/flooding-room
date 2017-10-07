@@ -41,7 +41,7 @@ class Room(object):
         if sid in self.players_bets:
             PlayerInRoomException('{sid} already in room {roomid}'.format(sid=sid, roomid=self.id))
             return
-        if self.is_full():
+        if self.is_full:
             raise RoomOverflowException('{roomid} room is full'.format(roomid=self.id))
         if self.round != 0:
             raise GameStartedException('Game in {roomid} already started'.format(roomid=self.id))
