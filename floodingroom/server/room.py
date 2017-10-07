@@ -41,7 +41,7 @@ class Room(object):
         if sid in self.players_bets:
             PlayerInRoomException('{sid} already in room {roomid}'.format(sid=sid, roomid=self.id))
             return
-        if len(self.players_bets) > self.players_limit:
+        if self.is_full():
             raise RoomOverflowException('{roomid} room is full'.format(roomid=self.id))
         if self.round != 0:
             raise GameStartedException('Game in {roomid} already started'.format(roomid=self.id))
@@ -65,10 +65,6 @@ class Room(object):
         for player, bet in self.players_bets.items():
             if not bet:
                 self.add_random_bet(player, 0, self.bet_limit)
-
-    def is_game_over(self):
-        self.total += sum([v for k, v in self.players_bets.items()])
-        return self.is_game_over
 
     @property
     def is_game_over(self):
