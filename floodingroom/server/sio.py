@@ -12,8 +12,9 @@ from .room import Room
 class SIO(flask_socketio.SocketIO):
 
     def __init__(self):
-        flask_socketio.SocketIO.__init__(self, app)
+        flask_socketio.SocketIO.__init__(self, app, async_mode="eventlet")
         self.room = None
+        self.room_semaphore = None
         self.__configure()
 
     def __configure(self):
@@ -29,9 +30,10 @@ class SIO(flask_socketio.SocketIO):
                 self.room = Room(
                     roomid=uuid.uuid4().hex,
                     points_limit=100,
-                    players_limit=10,
+                    players_limit=2,
                     round_limit=3,
                     bet_limit=30)
+                self.room_semaphore = eventlet.Semaphore()
             roomid = self.room.id
             print("current room id: %s" % roomid)
             # get unique user id
@@ -53,23 +55,23 @@ class SIO(flask_socketio.SocketIO):
                 "player_type": player.type,
                 "players": repr(self.room.players),
             })
-            # start if full
-            if self.room.is_full:
-                print("room is full, start!")
-                self.room.start()
-                flask_socketio.emit("start", {}, room=roomid)
-                return
-            # wait for 30 seconds from room creation time
+
+        @self.on("check")
+        def check(json):
+            print("checking for client %s" % flask.request.sid)
+            # start if full or it's time to
             start_time = self.room.timestamp + datetime.timedelta(seconds=30)
             now = datetime.datetime.utcnow()
-            if now < start_time:
-                print("sleeping")
-                eventlet.sleep((start_time - now).total_seconds())
-            # check whether the game has already started
-            if not self.room.is_started:
-                # start anyway
-                self.room.start()
-                flask_socketio.emit("start", {}, room=roomid)
+            if not self.room.is_full and now < start_time:
+                period = (start_time - now).total_seconds()
+                print("ask client %s to hold for %f seconds" % (flask.request.sid, period))
+                flask_socketio.emit("hold", {"period": period})
+                return
+            print("start!")
+            with self.room_semaphore:
+                if not self.room.is_started:
+                    self.room.start()
+                    flask_socketio.emit("start", {}, room=self.room.id, broadcast=True)
 
         @self.on("disconnect")
         def disconnect():
