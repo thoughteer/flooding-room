@@ -1,5 +1,7 @@
 #!/bin/bash
 
+(cd floodingroom/client && npm install)
+
 if [ -z "$1" ]
 then
     python -m floodingroom.api &
