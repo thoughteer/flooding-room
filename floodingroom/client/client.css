@@ -30,3 +30,19 @@
     max-height:100%;
     overflow:auto;
 }
+
+#bet_overlay {
+    position: absolute;
+    width: 640px;
+    left: 128px;
+    bottom: 64px; /* default, overwritten by js */
+}
+
+#bet_level {
+    position: absolute;
+    height: 0;
+    width: 640px;
+    left: 128px;
+    bottom: 64px; /* default, overwritten by js */
+    background-color: rgba(0, 0, 255, 0.5);
+}

@@ -2,6 +2,7 @@
 
 var socket;
 var options;
+var room;
 
 $(document).ready(function() {
     $("#start_button").click(function() {
@@ -21,7 +22,19 @@ $(document).ready(function() {
 
         socket.on("start", function(data) {
             console.info("Game started!");
-            $("#start_overlay").css("display", "none");
+            room = {total: 0};
+            $("#start_overlay").css("display", "none")
+            var bet_overlay = $("<div id='bet_overlay'></div>");
+            bet_overlay.css("height", options.bet_limit + "px");
+            bet_overlay.css("bottom", (room.total + 64) + "px");
+            var bet_level = $("<div id='bet_level'></div>");
+            bet_level.css("bottom", (room.total + 64) + "px");
+            $("#container").append(bet_level);
+            $("#container").append(bet_overlay);
+            $(bet_overlay).mousemove(function(event) {
+                var height = $(bet_overlay).height() - event.offsetY;
+                $(bet_level).css("height", height + "px");
+            });
         });
 
         socket.emit("ready", {});
