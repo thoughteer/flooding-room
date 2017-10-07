@@ -1,3 +1,4 @@
+import datetime
 import uuid
 
 import flask
@@ -21,7 +22,8 @@ class SIO(flask_socketio.SocketIO):
             print("connect ", flask.request.sid)
 
         @self.on("ready")
-        def play(json):
+        def accept(json):
+            # create room if it doesn't exist yet or we're done
             if self.room is None or self.room.is_game_over:
                 self.room = Room(
                     roomid=uuid.uuid4().hex,
@@ -29,8 +31,13 @@ class SIO(flask_socketio.SocketIO):
                     players_limit=10,
                     round_limit=3,
                     bet_limit=30)
+            roomid = self.room.id
+            # get unique user id
+            sid = flask.request.sid
+            # try to add the player
             try:
-                player = self.room.add_player(flask.request.sid)
+                player = self.room.add_player(sid)
+                self.join_room(roomid, sid=sid)
             except Exception as exc:
                 self.emit("decline", {"reason": str(exc)})
                 return
@@ -39,8 +46,24 @@ class SIO(flask_socketio.SocketIO):
                 "players_limit": self.room.players_limit,
                 "round_limit": self.room.round_limit,
                 "bet_limit": self.room.bet_limit,
+                "player_count": len(self.room.players),
                 "player_type": player.type,
             })
+            # start if full
+            if len(self.room.players) == self.room.players_limit:
+                self.room.start()
+                self.emit("start", {}, room=roomid)
+                return
+            # wait for 30 seconds from room creation time
+            start_time = self.room.timestamp + datetime.timedelta(seconds=30)
+            now = datetime.datetime.utcnow()
+            if now < start_time:
+                self.sleep((start_time - now).total_seconds())
+            # check whether the game has already started
+            if not self.room.is_started:
+                # start anyway
+                self.room.start()
+                self.emit("start", {}, room=roomid)
 
         @self.on("disconnect")
         def disconnect():
