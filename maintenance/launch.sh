@@ -1,6 +1,6 @@
 #!/bin/bash
 
-(cd floodingroom/client && npm install)
+# (cd floodingroom/client && npm install)
 
 if [ -z "$1" ]
 then
