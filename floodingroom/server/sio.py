@@ -73,6 +73,11 @@ class SIO(flask_socketio.SocketIO):
                     self.room.start()
                     flask_socketio.emit("start", {}, room=self.room.id, broadcast=True)
 
+        @self.on("bet")
+        def bet(json):
+            print(f"bet from {flask.request.sid}: {json['bet']}")
+            self.room.add_bet(flask.request.sid, json["bet"])
+
         @self.on("disconnect")
         def disconnect():
             print("disconnect ", flask.request.sid)
