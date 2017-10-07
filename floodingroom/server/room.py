@@ -53,6 +53,9 @@ class Player(object):
             raise BetOverflowException('{id} makes too big bet, limit is {limit}'.format(id=id, limit=self.bet_limit))
         self._bet = points
 
+    def clear_bet(self):
+        self._bet = None
+
 
 class Room(object):
     def __init__(self, roomid, points_limit, players_limit, round_limit, bet_limit):
@@ -95,6 +98,14 @@ class Room(object):
     def end_round(self):
         self.round += 1
         self.total += sum([player.bet for id, player in self.players.items()])
+        for player in self.players:
+            player.clear_bet()
+
+    def end_game(self):
+        balance = 100.0 - self.total * 100.0 / self.points_limit
+        if 0 < balance < 20.0:
+            return "Bad persons win"
+        return "Good persons win"
 
     @property
     def is_game_over(self):
