@@ -1,3 +1,4 @@
+import datetime
 import random
 
 
@@ -55,7 +56,9 @@ class Player(object):
 
 class Room(object):
     def __init__(self, roomid, points_limit, players_limit, round_limit, bet_limit):
+        self.timestamp = datetime.datetime.utcnow()
         self.id = roomid
+        self.is_started = False
         self.points_limit = points_limit
         self.players_limit = players_limit
         self.round_limit = round_limit
@@ -71,12 +74,15 @@ class Room(object):
             return Player.Type.evil
         return Player.Type.good
 
+    def start(self):
+        self.is_started = True
+
     def add_player(self, sid):
         if sid in self.players:
             raise PlayerInRoomException('{sid} already in room {roomid}'.format(sid=sid, roomid=self.id))
         if self.is_full:
             raise RoomOverflowException('{roomid} room is full'.format(roomid=self.id))
-        if self.round != 0:
+        if self.is_started:
             raise GameStartedException('Game in {roomid} already started'.format(roomid=self.id))
 
         self.players[sid] = Player(sid, self.get_player_type(), self.bet_limit)
