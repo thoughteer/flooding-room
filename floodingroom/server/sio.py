@@ -75,6 +75,11 @@ class SIO(flask_socketio.SocketIO):
         def bet(json):
             print(f"bet from {flask.request.sid}: {json['bet']}")
             self.room.add_bet(flask.request.sid, json["bet"])
+            if self.room.are_all_bets_made:
+                self.room.end_round()
+                if self.room.is_game_over:
+                    pass # TODO
+                flask_socketio.emit("round", {"total": self.room.total}, room=self.room.id)
 
         @self.on("disconnect")
         def disconnect():

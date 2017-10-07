@@ -56,16 +56,27 @@ class Player(object):
             raise BetOverflowException('{id} makes too big bet, limit is {limit}'.format(id=id, limit=self.bet_limit))
         self._bet = points
 
+    @property
+    def is_bet_made(self):
+        return self._bet is not None
+
     def clear_bet(self):
         self._bet = None
 
 
-class GoodBot(Player):
+class Bot(Player):
+
+    @property
+    def is_bet_made(self):
+        return True
+
+
+class GoodBot(Bot):
     def __init__(self, bet_limit):
         super().__init__(self, self.Type.good, bet_limit)
 
 
-class BadBot(Player):
+class BadBot(Bot):
     def __init__(self, bet_limit):
         super().__init__(self, self.Type.evil, bet_limit)
         self._constant_bet = bet_limit if random.randint(0, 1) else 0
@@ -122,7 +133,7 @@ class Room(object):
     def end_round(self):
         self.round += 1
         self.total += sum(player.bet for player in self.players.values())
-        for player in self.players:
+        for player in self.players.values():
             player.clear_bet()
 
     def end_game(self):
@@ -130,6 +141,10 @@ class Room(object):
         if 0 < balance < 20.0:
             return "Good persons win"
         return "Bad persons win"
+
+    @property
+    def are_all_bets_made(self):
+        return all(player.is_bet_made for player in self.players.values())
 
     @property
     def is_game_over(self):

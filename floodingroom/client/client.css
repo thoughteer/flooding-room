@@ -31,6 +31,15 @@
     overflow:auto;
 }
 
+#water {
+    position: absolute;
+    height: 0; /* default, overwritten by js */
+    width: 640px;
+    left: 128px;
+    bottom: 64px;
+    background-color: rgba(0, 66, 166, 0.9);
+}
+
 #bet_overlay {
     position: absolute;
     width: 640px;
@@ -40,9 +49,9 @@
 
 #bet_level {
     position: absolute;
-    height: 0;
+    height: 0; /* default, overwritten by js */
     width: 640px;
     left: 128px;
     bottom: 64px; /* default, overwritten by js */
-    background-color: rgba(0, 0, 255, 0.5);
+    background-color: rgba(0, 66, 166, 0.5);
 }
