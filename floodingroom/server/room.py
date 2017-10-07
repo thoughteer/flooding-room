@@ -42,7 +42,12 @@ class Room(object):
                 self.add_random_bet(player, 0, 20)
 
         self.total += sum([v for k, v in self.players_bets.items()])
-        if self.total >= self.points_limit or self.round >= self.round_limit:
-            return True
+        return self.is_game_over
 
-        return False
+    @property
+    def is_game_over(self):
+        return self.total >= self.points_limit or self.round >= self.round_limit
+
+    @property
+    def is_full(self):
+        return len(self.players_bets) >= self.players_limit
