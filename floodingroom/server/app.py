@@ -1,36 +1,22 @@
 import pkg_resources
 
 import flask
-import socketio
 
 
-sio = socketio.Server()
+class App(flask.Flask):
 
-app = flask.Flask(__name__)
-app.static_folder = pkg_resources.resource_filename("floodingroom", "server/resources")
+    def __init__(self):
+        flask.Flask.__init__(self, __name__)
+        self.__configure()
 
+    def __configure(self):
 
-@app.route("/")
-def index():
-    return app.send_static_file("index.html")
+        @self.route("/")
+        def index():
+            return self.send_static_file("index.html")
 
-
-@sio.on('connect')
-def connect(sid, environ):
-    print("connect ", sid)
-
-
-@sio.on("ready")
-def ready(sid, data):
-    sio.emit("accept", room=sid)
+        self.config["SECRET_KEY"] = "the secret"
+        self.static_folder = pkg_resources.resource_filename("floodingroom", "server/resources")
 
 
-@sio.on('chat message')
-def message(sid, data):
-    print("message ", data)
-    sio.emit('reply', room=sid)
-
-
-@sio.on('disconnect')
-def disconnect(sid):
-    print('disconnect ', sid)
+app = App()
