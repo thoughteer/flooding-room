@@ -30,6 +30,15 @@ $(document).ready(function() {
             $("#start_button").remove();
             $("#start_overlay").html("<img src='static/img/rules1-" + options.player_type + ".png'/>");
             console.log(data);
+            socket.emit("check", {});
+        });
+
+        socket.on("hold", function (data) {
+            console.log("asked to hold: ", data)
+            setTimeout(function () {
+                console.log("rechecking")
+                socket.emit("check", {});
+            }, data["period"] * 1000)
         });
 
         socket.on("decline", function(data) {
