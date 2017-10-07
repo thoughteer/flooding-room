@@ -37,7 +37,7 @@ class SIO(flask_socketio.SocketIO):
             # try to add the player
             try:
                 player = self.room.add_player(sid)
-                self.join_room(roomid, sid=sid)
+                flask_socketio.join_room(roomid, sid=sid)
             except Exception as exc:
                 self.emit("decline", {"reason": str(exc)})
                 return
