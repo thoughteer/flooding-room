@@ -15,8 +15,9 @@ configuration = {
     "packages": setuptools.find_packages(exclude=["tests", "tests.*"]),
     "include_package_data": True,
     "install_requires": [
-        "aiohttp >= 2.2.5",
+        "flask >= 0.12.2",
         "python-socketio >= 1.8.1",
+        "eventlet >= 0.21.0",
     ],
     "zip_safe": False,
 }
