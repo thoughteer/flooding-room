@@ -19,6 +19,11 @@ $(document).ready(function() {
             console.error(data["reason"]);
         });
 
+        socket.on("start", function(data) {
+            console.info("Game started!");
+            $("#start_overlay").css("display", "none");
+        });
+
         socket.emit("ready", {});
     });
 });

@@ -41,6 +41,9 @@ class Player(object):
         self.bet_limit = bet_limit
         self._bet = None
 
+    def __repr__(self):
+        return f"<{self.type} player {self.id}>"
+
     @property
     def bet(self):
         if not self._bet:
@@ -103,10 +106,10 @@ class Room(object):
     def add_player(self, sid):
         if sid in self.players:
             raise PlayerInRoomException('{sid} already in room {roomid}'.format(sid=sid, roomid=self.id))
-        if self.is_full:
-            raise RoomOverflowException('{roomid} room is full'.format(roomid=self.id))
         if self.is_started:
             raise GameStartedException('Game in {roomid} already started'.format(roomid=self.id))
+        if self.is_full:
+            raise RoomOverflowException('{roomid} room is full'.format(roomid=self.id))
 
         self.players[sid] = Player(sid, self.get_next_player_type(), self.bet_limit)
         return self.players[sid]
