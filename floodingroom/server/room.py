@@ -1,5 +1,6 @@
 import datetime
 import random
+import time
 
 
 class RoomException(Exception):
@@ -89,7 +90,7 @@ class BadBot(Bot):
 
 class Room(object):
     def __init__(self, roomid, points_limit, players_limit, round_limit, target_level):
-        self.timestamp = datetime.datetime.utcnow()
+        self.timestamp = time.perf_counter()
         self.id = roomid
         self.is_started = False
         self.points_limit = points_limit
@@ -116,7 +117,7 @@ class Room(object):
                 bot = BadBot(self.bet_limit, self)
             self.players[bot] = bot
         self.is_started = True
-        self.timestamp = datetime.datetime.utcnow()
+        self.timestamp = time.perf_counter()
 
     def add_player(self, sid):
         if sid in self.players:
@@ -139,7 +140,7 @@ class Room(object):
         self.total += sum(player.bet for player in self.players.values())
         for player in self.players.values():
             player.clear_bet()
-        self.timestamp = datetime.datetime.utcnow()
+        self.timestamp = time.perf_counter()
 
     def end_game(self):
         balance = self.total * 100.0 / self.points_limit
