@@ -55,7 +55,7 @@ class SIO(flask_socketio.SocketIO):
             # TODO: dispatch properly
             if event == "start":
                 # start if full or it's time to
-                start_time = room.timestamp + 5
+                start_time = room.timestamp + 30
                 now = time.perf_counter()
                 if not room.is_full and now < start_time:
                     period = min(5, start_time - now)
@@ -69,7 +69,7 @@ class SIO(flask_socketio.SocketIO):
                         flask_socketio.emit("start", {}, room=room.id, broadcast=True)
                 return
             if event == "round":
-                round_end_time = room.timestamp + 5
+                round_end_time = room.timestamp + 15
                 now = time.perf_counter()
                 if not room.are_all_bets_made and now < round_end_time:
                     period = min(5, round_end_time - now)
@@ -99,6 +99,10 @@ class SIO(flask_socketio.SocketIO):
         @self.on("disconnect")
         def disconnect():
             print("disconnect ", flask.request.sid)
-
+            room = self.rooms.get_room_with_player(flask.request.sid)
+            room.replace_with_bot(flask.request.sid)
+            if room.has_only_bots:
+                print("dropped bot only room")
+                self.rooms.delete_room(room)
 
 sio = SIO()

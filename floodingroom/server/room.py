@@ -146,6 +146,17 @@ class Room(object):
             return "good"
         return "evil"
 
+    def replace_with_bot(self, sid):
+        if sid not in self.players:
+            raise KeyError
+        type = self.players[sid].type
+        del self.players[sid]
+        if type == Player.Type.good:
+            bot = GoodBot(self.bet_limit, self)
+        else:
+            bot = BadBot(self.bet_limit, self)
+        self.players[bot] = bot
+
     @property
     def are_all_bets_made(self):
         return all(player.is_bet_made for player in self.players.values())
@@ -157,6 +168,10 @@ class Room(object):
     @property
     def is_full(self):
         return len(self.players) >= self.players_limit
+
+    @property
+    def has_only_bots(self):
+        return all(isinstance(player, Bot) for player in self.players.values())
 
     @property
     def player_count(self):
