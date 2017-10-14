@@ -73,13 +73,13 @@ class Bot(Player):
 
 
 class GoodBot(Bot):
-    def __init__(self, bet_limit):
-        super().__init__(self, self.Type.good, bet_limit)
+    def __init__(self, bet_limit, room):
+        super().__init__(self, self.Type.good, bet_limit, room)
 
 
 class BadBot(Bot):
-    def __init__(self, bet_limit):
-        super().__init__(self, self.Type.evil, bet_limit)
+    def __init__(self, bet_limit, room):
+        super().__init__(self, self.Type.evil, bet_limit, room)
         self._constant_bet = bet_limit if random.randint(0, 1) else 0
 
     @property
@@ -111,9 +111,9 @@ class Room(object):
     def start_game(self):
         for _ in range(self.players_limit - self.player_count):
             if self.get_next_player_type() == Player.Type.good:
-                bot = GoodBot(self.bet_limit)
+                bot = GoodBot(self.bet_limit, self)
             else:
-                bot = BadBot(self.bet_limit)
+                bot = BadBot(self.bet_limit, self)
             self.players[bot] = bot
         self.is_started = True
         self.timestamp = datetime.datetime.utcnow()
