@@ -89,11 +89,10 @@ class BadBot(Bot):
 
 
 class Room(object):
-    def __init__(self, roomid, points_limit, players_limit, round_limit, target_level):
+    def __init__(self, roomid, players_limit, round_limit, target_level):
         self.timestamp = time.perf_counter()
         self.id = roomid
         self.is_started = False
-        self.points_limit = points_limit
         self.players_limit = players_limit
         self.round_limit = round_limit
         self.target_level = target_level
@@ -143,8 +142,7 @@ class Room(object):
         self.timestamp = time.perf_counter()
 
     def end_game(self):
-        balance = self.total * 100.0 / self.points_limit
-        if self.target_level <= balance < 1:
+        if self.target_level <= self.total < 1:
             return "good"
         return "evil"
 
@@ -154,7 +152,7 @@ class Room(object):
 
     @property
     def is_game_over(self):
-        return self.total >= self.points_limit or self.round > self.round_limit
+        return self.total >= 1 or self.round > self.round_limit
 
     @property
     def is_full(self):

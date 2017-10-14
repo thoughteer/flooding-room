@@ -35,7 +35,7 @@ class SIO(flask_socketio.SocketIO):
                 flask_socketio.emit("decline", {"reason": str(exc)})
                 return
             flask_socketio.emit("accept", {
-                "points_limit": room.points_limit,
+                "points_limit": 1.0,
                 "players_limit": room.players_limit,
                 "round_limit": room.round_limit,
                 "bet_limit": room.bet_limit,

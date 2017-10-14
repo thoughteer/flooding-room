@@ -19,7 +19,6 @@ class RoomStorage(object):
             raise RuntimeError("rooms limit reached!")
         room = Room(
             roomid=uuid.uuid4().hex,
-            points_limit=100,
             players_limit=3,
             round_limit=3,
             target_level=0.75)
