@@ -105,7 +105,7 @@ class Room(object):
             return Player.Type.evil
         return Player.Type.good
 
-    def start(self):
+    def start_game(self):
         for _ in range(self.players_limit - self.player_count):
             if self.get_next_player_type() == Player.Type.good:
                 bot = GoodBot(self.bet_limit)
@@ -138,9 +138,9 @@ class Room(object):
 
     def end_game(self):
         balance = 100.0 - self.total * 100.0 / self.points_limit
-        if 0 < balance < 20.0:
-            return "Good persons win"
-        return "Bad persons win"
+        if 0 < balance <= 25.0:
+            return "good"
+        return "evil"
 
     @property
     def are_all_bets_made(self):

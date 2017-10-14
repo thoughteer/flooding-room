@@ -70,7 +70,7 @@ class SIO(flask_socketio.SocketIO):
             print("start!")
             with self.room_semaphore:
                 if not self.room.is_started:
-                    self.room.start()
+                    self.room.start_game()
                     flask_socketio.emit("start", {}, room=self.room.id, broadcast=True)
 
         @self.on("bet")
@@ -80,7 +80,12 @@ class SIO(flask_socketio.SocketIO):
             if self.room.are_all_bets_made:
                 self.room.end_round()
                 if self.room.is_game_over:
-                    pass # TODO
+                    winners = self.room.end_game()
+                    flask_socketio.emit("end", {
+                        "total": self.room.total,
+                        "winners": winners,
+                        "is_winner": self.room.players[flask.request.sid].type == winners,
+                    }, room=self.room.id)
                 flask_socketio.emit("round", {"total": self.room.total}, room=self.room.id)
 
         @self.on("disconnect")

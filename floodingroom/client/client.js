@@ -9,7 +9,7 @@ $(document).ready(function() {
     var container = $("#container");
 
     function update_interface(callback) {
-        var water_height = (room.total * 640 / options.points_limit);
+        var water_height = (room.total * 512 / options.points_limit);
         var water = $("#water");
         var bet_overlay = $("#bet_overlay");
         var bet_level = $("#bet_level");
@@ -79,6 +79,10 @@ $(document).ready(function() {
         socket.on("round", function(data) {
             room.total = data.total;
             update_interface(function() { bet_made = false; });
+        });
+
+        socket.on("end", function(data) {
+            console.info("Game ended!", data);
         });
 
         socket.emit("ready", {});
