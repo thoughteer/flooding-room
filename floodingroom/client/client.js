@@ -14,7 +14,7 @@ $(document).ready(function() {
         var bet_overlay = $("#bet_overlay");
         var bet_level = $("#bet_level");
         var bet_overlay_bottom = water_height + 64;
-        var bet_overlay_height = Math.min(options.bet_limit * 640.0 / options.points_limit, 640 - water_height + 1);
+        var bet_overlay_height = Math.min(options.bet_limit * 512.0 / options.points_limit, 512 - water_height + 1);
         bet_overlay.css("bottom", bet_overlay_bottom + "px");
         bet_overlay.css("height", bet_overlay_height + "px");
         var duration = (water_height - water.height()) * 3;
@@ -51,11 +51,13 @@ $(document).ready(function() {
             room = {total: 0};
             $("#start_overlay").css("display", "none");
             var water = $("<div id='water'></div>");
+            var room_overlay = $("<div id='room_overlay'></div>");
             var bet_overlay = $("<div id='bet_overlay'></div>");
             var bet_level = $("<div id='bet_level'></div>");
             container.append(bet_level);
-            container.append(bet_overlay);
             container.append(water);
+            container.append(room_overlay);
+            container.append(bet_overlay);
             bet_made = false;
             bet_overlay.mousemove(function(event) {
                 if (!bet_made) {
