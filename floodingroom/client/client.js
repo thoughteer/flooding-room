@@ -72,18 +72,19 @@ $(document).ready(function() {
                 console.info("Making bet:", bet);
                 socket.emit("bet", {bet: bet});
                 bet_made = true;
-                socket.emit("check", {"event": "round"})
             });
             update_interface();
+            socket.emit("check", {"event": "round"})
         });
 
         socket.on("round", function(data) {
             room.total = data.total;
-            update_interface(function() { bet_made = false; });
-        });
-
-        socket.on("end", function(data) {
-            console.info("Game ended!", data);
+            update_interface(function() { bet_made = data.is_final; });
+            if (data["is_final"]) {
+                console.info("Game ended!", data);
+            } else {
+                socket.emit("check", {"event": "round"})
+            }
         });
 
         socket.emit("ready", {});
