@@ -63,7 +63,7 @@ class SIO(flask_socketio.SocketIO):
             start_time = self.room.timestamp + datetime.timedelta(seconds=30)
             now = datetime.datetime.utcnow()
             if not self.room.is_full and now < start_time:
-                period = (start_time - now).total_seconds()
+                period = min(5, (start_time - now).total_seconds())
                 print("ask client %s to hold for %f seconds" % (flask.request.sid, period))
                 flask_socketio.emit("hold", {"period": period})
                 return
