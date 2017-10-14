@@ -8,17 +8,18 @@ var bet_made;
 $(document).ready(function() {
     var container = $("#container");
 
-    function update_interface() {
+    function update_interface(callback) {
         var water_height = (room.total * 640 / options.points_limit);
         var water = $("#water");
         var bet_overlay = $("#bet_overlay");
         var bet_level = $("#bet_level");
-        water.css("height", water_height + "px");
         var bet_overlay_bottom = water_height + 64;
         var bet_overlay_height = Math.min(options.bet_limit * 640.0 / options.points_limit, 640 - water_height + 1);
-        bet_overlay.css("height", bet_overlay_height + "px");
         bet_overlay.css("bottom", bet_overlay_bottom + "px");
-        bet_level.css("bottom", bet_overlay_bottom + "px");
+        bet_overlay.css("height", bet_overlay_height + "px");
+        var duration = (water_height - water.height()) * 3;
+        water.animate({height: water_height}, {duration: duration, queue: false, complete: callback});
+        bet_level.animate({bottom: bet_overlay_bottom, height: 0}, {duration: duration, queue: false});
     }
 
     $("#start_button").click(function() {
@@ -34,9 +35,9 @@ $(document).ready(function() {
         });
 
         socket.on("hold", function (data) {
-            console.log("asked to hold: ", data)
+            console.log("asked to hold: ", data);
             setTimeout(function () {
-                console.log("rechecking")
+                console.log("rechecking");
                 socket.emit("check", {});
             }, data["period"] * 1000)
         });
@@ -60,6 +61,8 @@ $(document).ready(function() {
                 if (!bet_made) {
                     var height = bet_overlay.height() - event.offsetY;
                     bet_level.css("height", height + "px");
+                    //bet_level.stop(true);
+                    //bet_level.animate({height: height}, 50);
                 }
             });
             bet_overlay.mouseup(function(event) {
@@ -75,8 +78,7 @@ $(document).ready(function() {
 
         socket.on("round", function(data) {
             room.total = data.total;
-            bet_made = false;
-            update_interface();
+            update_interface(function() { bet_made = false; });
         });
 
         socket.emit("ready", {});
