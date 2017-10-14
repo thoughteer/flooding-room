@@ -23,7 +23,7 @@ $(document).ready(function() {
 
     $("#start_button").click(function() {
         console.log("Connecting...");
-        socket = io("http://localhost:8080");
+        socket = io(document.location.origin);
 
         socket.on("accept", function (data) {
             options = data;
