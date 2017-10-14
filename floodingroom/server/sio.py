@@ -93,7 +93,6 @@ class SIO(flask_socketio.SocketIO):
                     winners = self.room.end_game()
                     result["is_final"] = True
                     result["winners"] = winners
-                    result["is_winner"] = self.room.players[flask.request.sid].type == winners
                 else:
                     result["is_final"] = False
                 flask_socketio.emit("round", result, room=self.room.id)

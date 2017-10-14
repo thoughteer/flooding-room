@@ -64,3 +64,27 @@
     bottom: 64px; /* default, overwritten by js */
     background-color: rgba(0, 66, 166, 0.5);
 }
+
+#splash {
+    position: absolute;
+    width: 896px;
+    height: 640px;
+    left: 0;
+    top: 0;
+}
+
+#splash.good-victory {
+    background: url("static/img/end1-good-victory.png");
+}
+
+#splash.good-defeat {
+    background: url("static/img/end1-good-defeat.png");
+}
+
+#splash.evil-victory {
+    background: url("static/img/end1-evil-victory.png");
+}
+
+#splash.evil-defeat {
+    background: url("static/img/end1-evil-defeat.png");
+}
