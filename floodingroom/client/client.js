@@ -97,6 +97,12 @@ $(document).ready(function() {
                         "'></div>");
                     start_overlay.empty();
                     start_overlay.append(splash);
+                    var play_again_button = $("<img id='again_button' src='static/img/again1.png'/>");
+                    play_again_button.click(function() {
+                        $(":not(#start_overlay)", container).remove();
+                        socket.emit("ready", {});
+                    });
+                    start_overlay.append(play_again_button);
                     container.append(start_overlay);
                 }
             });

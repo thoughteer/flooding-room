@@ -27,6 +27,14 @@
 #start_button {
     width: 401px;
     height: 149px;
+}
+
+#again_button {
+    width: auto;
+    height: auto;
+}
+
+#start_button, #again_button {
     cursor: pointer;
 
     position:absolute; /*it can be fixed too*/
