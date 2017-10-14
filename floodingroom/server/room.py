@@ -35,11 +35,12 @@ class Player(object):
         evil = 'evil'
         good = 'good'
 
-    def __init__(self, id, type, bet_limit):
+    def __init__(self, id, type, bet_limit, room):
         self.id = id
         self.type = type
         self.bet_limit = bet_limit
         self._bet = None
+        self.room = room
 
     def __repr__(self):
         return f"<{self.type} player {self.id}>"
@@ -123,7 +124,7 @@ class Room(object):
         if self.is_full:
             raise RoomOverflowException('{roomid} room is full'.format(roomid=self.id))
 
-        self.players[sid] = Player(sid, self.get_next_player_type(), self.bet_limit)
+        self.players[sid] = Player(sid, self.get_next_player_type(), self.bet_limit, self)
         return self.players[sid]
 
     def add_bet(self, sid, points):
