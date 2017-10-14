@@ -31,14 +31,14 @@ $(document).ready(function() {
             $("#start_button").remove();
             $("#start_overlay").html("<img src='static/img/rules1-" + options.player_type + ".png'/>");
             console.log(data);
-            socket.emit("check", {});
+            socket.emit("check", {"event": "start"});
         });
 
         socket.on("hold", function (data) {
             console.log("asked to hold: ", data);
             setTimeout(function () {
                 console.log("rechecking");
-                socket.emit("check", {});
+                socket.emit("check", data);
             }, data["period"] * 1000)
         });
 
@@ -72,6 +72,7 @@ $(document).ready(function() {
                 console.info("Making bet:", bet);
                 socket.emit("bet", {bet: bet});
                 bet_made = true;
+                socket.emit("check", {"event": "round"})
             });
             update_interface();
         });

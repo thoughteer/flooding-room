@@ -58,26 +58,33 @@ class SIO(flask_socketio.SocketIO):
 
         @self.on("check")
         def check(json):
-            print("checking for client %s" % flask.request.sid)
-            # start if full or it's time to
-            start_time = self.room.timestamp + datetime.timedelta(seconds=30)
-            now = datetime.datetime.utcnow()
-            if not self.room.is_full and now < start_time:
-                period = min(5, (start_time - now).total_seconds())
-                print("ask client %s to hold for %f seconds" % (flask.request.sid, period))
-                flask_socketio.emit("hold", {"period": period})
+            sid = flask.request.sid
+            event = json["event"]
+            print(f"checking event {event} for client {sid}")
+            # TODO: dispatch properly
+            if event == "start":
+                # start if full or it's time to
+                start_time = self.room.timestamp + datetime.timedelta(seconds=30)
+                now = datetime.datetime.utcnow()
+                if not self.room.is_full and now < start_time:
+                    period = min(5, (start_time - now).total_seconds())
+                    print("ask client %s to hold for %f seconds" % (flask.request.sid, period))
+                    flask_socketio.emit("hold", {"event": event, "period": period})
+                    return
+                print("start!")
+                with self.room_semaphore:
+                    if not self.room.is_started:
+                        self.room.start_game()
+                        flask_socketio.emit("start", {}, room=self.room.id, broadcast=True)
                 return
-            print("start!")
-            with self.room_semaphore:
-                if not self.room.is_started:
-                    self.room.start_game()
-                    flask_socketio.emit("start", {}, room=self.room.id, broadcast=True)
-
-        @self.on("bet")
-        def bet(json):
-            print(f"bet from {flask.request.sid}: {json['bet']}")
-            self.room.add_bet(flask.request.sid, json["bet"])
-            if self.room.are_all_bets_made:
+            if event == "round":
+                round_end_time = self.room.timestamp + datetime.timedelta(seconds=(30 + 15 * self.room.round))
+                now = datetime.datetime.utcnow()
+                if not self.room.are_all_bets_made and now < round_end_time:
+                    period = min(5, (round_end_time - now).total_seconds())
+                    print("ask client %s to hold for %f seconds" % (flask.request.sid, period))
+                    flask_socketio.emit("hold", {"event": event, "period": period})
+                    return
                 self.room.end_round()
                 if self.room.is_game_over:
                     winners = self.room.end_game()
@@ -86,7 +93,14 @@ class SIO(flask_socketio.SocketIO):
                         "winners": winners,
                         "is_winner": self.room.players[flask.request.sid].type == winners,
                     }, room=self.room.id)
-                flask_socketio.emit("round", {"total": self.room.total}, room=self.room.id)
+                else:
+                    flask_socketio.emit("round", {"total": self.room.total}, room=self.room.id)
+                return
+
+        @self.on("bet")
+        def bet(json):
+            print(f"bet from {flask.request.sid}: {json['bet']}")
+            self.room.add_bet(flask.request.sid, json["bet"])
 
         @self.on("disconnect")
         def disconnect():

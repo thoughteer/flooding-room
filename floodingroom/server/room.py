@@ -96,7 +96,7 @@ class Room(object):
         self.round_limit = round_limit
         self.bet_limit = bet_limit
         self.total = 0
-        self.round = 0
+        self.round = 1
         self.players = {}
         self.pidors = random.sample(range(players_limit), players_limit // 3)
 
@@ -148,7 +148,7 @@ class Room(object):
 
     @property
     def is_game_over(self):
-        return self.total >= self.points_limit or self.round >= self.round_limit
+        return self.total >= self.points_limit or self.round > self.round_limit
 
     @property
     def is_full(self):
