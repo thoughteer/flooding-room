@@ -86,15 +86,15 @@ class SIO(flask_socketio.SocketIO):
                     flask_socketio.emit("hold", {"event": event, "period": period})
                     return
                 self.room.end_round()
+                result = {"total": self.room.total}
                 if self.room.is_game_over:
                     winners = self.room.end_game()
-                    flask_socketio.emit("end", {
-                        "total": self.room.total,
-                        "winners": winners,
-                        "is_winner": self.room.players[flask.request.sid].type == winners,
-                    }, room=self.room.id)
+                    result["is_final"] = True
+                    result["winners"] = winners
+                    result["is_winner"] = self.room.players[flask.request.sid].type == winners
                 else:
-                    flask_socketio.emit("round", {"total": self.room.total}, room=self.room.id)
+                    result["is_final"] = False
+                flask_socketio.emit("round", result, room=self.room.id)
                 return
 
         @self.on("bet")
