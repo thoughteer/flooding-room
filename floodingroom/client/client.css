@@ -6,6 +6,15 @@
     background: black url("static/img/room1.png");
 }
 
+#room_overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 896px;
+    height: 640px;
+    background: url("static/img/room1-overlay.png");
+}
+
 #start_overlay {
     position: absolute;
     left: 0;
@@ -34,8 +43,8 @@
 #water {
     position: absolute;
     height: 0; /* default, overwritten by js */
-    width: 640px;
-    left: 128px;
+    width: 896px;
+    left: 0;
     bottom: 64px;
     background-color: rgba(0, 66, 166, 0.9);
 }
@@ -50,8 +59,8 @@
 #bet_level {
     position: absolute;
     height: 0; /* default, overwritten by js */
-    width: 640px;
-    left: 128px;
+    width: 896px;
+    left: 0;
     bottom: 64px; /* default, overwritten by js */
     background-color: rgba(0, 66, 166, 0.5);
 }
