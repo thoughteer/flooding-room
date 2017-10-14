@@ -113,6 +113,7 @@ class Room(object):
                 bot = BadBot(self.bet_limit)
             self.players[bot] = bot
         self.is_started = True
+        self.timestamp = datetime.datetime.utcnow()
 
     def add_player(self, sid):
         if sid in self.players:
@@ -135,6 +136,7 @@ class Room(object):
         self.total += sum(player.bet for player in self.players.values())
         for player in self.players.values():
             player.clear_bet()
+        self.timestamp = datetime.datetime.utcnow()
 
     def end_game(self):
         balance = 100.0 - self.total * 100.0 / self.points_limit

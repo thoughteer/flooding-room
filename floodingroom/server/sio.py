@@ -26,7 +26,7 @@ class SIO(flask_socketio.SocketIO):
         @self.on("ready")
         def accept(json):
             # create room if it doesn't exist yet or we're done
-            if self.room is None or self.room.is_game_over:
+            if self.room is None:
                 self.room = Room(
                     roomid=uuid.uuid4().hex,
                     points_limit=100,
@@ -61,6 +61,8 @@ class SIO(flask_socketio.SocketIO):
             sid = flask.request.sid
             event = json["event"]
             print(f"checking event {event} for client {sid}")
+            if self.room is None:
+                return
             # TODO: dispatch properly
             if event == "start":
                 # start if full or it's time to
@@ -78,7 +80,7 @@ class SIO(flask_socketio.SocketIO):
                         flask_socketio.emit("start", {}, room=self.room.id, broadcast=True)
                 return
             if event == "round":
-                round_end_time = self.room.timestamp + datetime.timedelta(seconds=(30 + 15 * self.room.round))
+                round_end_time = self.room.timestamp + datetime.timedelta(seconds=15)
                 now = datetime.datetime.utcnow()
                 if not self.room.are_all_bets_made and now < round_end_time:
                     period = min(5, (round_end_time - now).total_seconds())
@@ -95,6 +97,8 @@ class SIO(flask_socketio.SocketIO):
                 else:
                     result["is_final"] = False
                 flask_socketio.emit("round", result, room=self.room.id)
+                if result["is_final"]:
+                    self.room = None
                 return
 
         @self.on("bet")

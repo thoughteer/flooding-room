@@ -72,6 +72,7 @@ $(document).ready(function() {
                 console.info("Making bet:", bet);
                 socket.emit("bet", {bet: bet});
                 bet_made = true;
+                socket.emit("check", {"event": "round"});
             });
             update_interface();
             socket.emit("check", {"event": "round"})
