@@ -48,7 +48,7 @@ class Player(object):
     @property
     def bet(self):
         if not self._bet:
-            return random.randint(0, self.bet_limit)
+            return random.random() * self.bet_limit
         return self._bet
 
     @bet.setter
