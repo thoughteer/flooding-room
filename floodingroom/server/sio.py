@@ -1,4 +1,5 @@
 import datetime
+import time
 
 import flask
 import flask_socketio
@@ -54,10 +55,10 @@ class SIO(flask_socketio.SocketIO):
             # TODO: dispatch properly
             if event == "start":
                 # start if full or it's time to
-                start_time = room.timestamp + datetime.timedelta(seconds=30)
-                now = datetime.datetime.utcnow()
+                start_time = room.timestamp + 5
+                now = time.perf_counter()
                 if not room.is_full and now < start_time:
-                    period = min(5, (start_time - now).total_seconds())
+                    period = min(5, start_time - now)
                     print("ask client %s to hold for %f seconds" % (flask.request.sid, period))
                     flask_socketio.emit("hold", {"event": event, "period": period})
                     return
@@ -68,10 +69,10 @@ class SIO(flask_socketio.SocketIO):
                         flask_socketio.emit("start", {}, room=room.id, broadcast=True)
                 return
             if event == "round":
-                round_end_time = room.timestamp + datetime.timedelta(seconds=15)
-                now = datetime.datetime.utcnow()
+                round_end_time = room.timestamp + 5
+                now = time.perf_counter()
                 if not room.are_all_bets_made and now < round_end_time:
-                    period = min(5, (round_end_time - now).total_seconds())
+                    period = min(5, round_end_time - now)
                     print("ask client %s to hold for %f seconds" % (flask.request.sid, period))
                     flask_socketio.emit("hold", {"event": event, "period": period})
                     return
