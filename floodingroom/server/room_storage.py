@@ -22,7 +22,7 @@ class RoomStorage(object):
             points_limit=100,
             players_limit=3,
             round_limit=3,
-            bet_limit=30)
+            target_level=0.75)
         room.semaphore = eventlet.Semaphore()
         self.rooms.append(room)
         print(f"new room spawned. now {len(self.rooms)} rooms")

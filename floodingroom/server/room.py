@@ -88,18 +88,20 @@ class BadBot(Bot):
 
 
 class Room(object):
-    def __init__(self, roomid, points_limit, players_limit, round_limit, bet_limit):
+    def __init__(self, roomid, points_limit, players_limit, round_limit, target_level):
         self.timestamp = datetime.datetime.utcnow()
         self.id = roomid
         self.is_started = False
         self.points_limit = points_limit
         self.players_limit = players_limit
         self.round_limit = round_limit
-        self.bet_limit = bet_limit
+        self.target_level = target_level
         self.total = 0
         self.round = 1
         self.players = {}
-        self.pidors = random.sample(range(players_limit), players_limit // 3)
+        pidor_count = random.randint(0, players_limit // 2)
+        self.pidors = random.sample(range(players_limit), pidor_count)
+        self.bet_limit = 2.0 * target_level / round_limit / (players_limit + (1 - target_level) * pidor_count)
 
     def get_next_player_type(self):
         if self.player_count in self.pidors:
@@ -140,8 +142,8 @@ class Room(object):
         self.timestamp = datetime.datetime.utcnow()
 
     def end_game(self):
-        balance = 100.0 - self.total * 100.0 / self.points_limit
-        if 0 < balance <= 25.0:
+        balance = self.total * 100.0 / self.points_limit
+        if self.target_level <= balance < 1:
             return "good"
         return "evil"
 
